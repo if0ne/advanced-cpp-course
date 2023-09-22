@@ -14,12 +14,12 @@ City GameRound::Run(GameStats& game_stats) {
 GameRound& GameRound::BuyAcres() {
     Acres acres_to_buy;
 
-    std::cout << "Ñêîëüêî àêðîâ çåìëè ïîâåëåâàåøü êóïèòü? ";
+    std::cout << "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸ Ð¿Ð¾Ð²ÐµÐ»ÐµÐ²Ð°ÐµÑˆÑŒ ÐºÑƒÐ¿Ð¸Ñ‚ÑŒ? ";
     std::cin >> acres_to_buy;
 
     while (acres_to_buy < 0 || acres_to_buy > new_city_.wheats / new_city_.acr_price) {
-        std::cout << "Íåâåðíîå êîëè÷åñòâî àêðîâ çåìëè\n";
-        std::cout << "Ñêîëüêî àêðîâ çåìëè ïîâåëåâàåøü êóïèòü? ";
+        std::cout << "ÐÐµÐ²ÐµÑ€Ð½Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸\n";
+        std::cout << "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸ Ð¿Ð¾Ð²ÐµÐ»ÐµÐ²Ð°ÐµÑˆÑŒ ÐºÑƒÐ¿Ð¸Ñ‚ÑŒ? ";
         std::cin >> acres_to_buy;
     }
 
@@ -32,12 +32,12 @@ GameRound& GameRound::BuyAcres() {
 GameRound& GameRound::SellAcres() {
     Acres acres_to_sell;
 
-    std::cout << "Ñêîëüêî àêðîâ çåìëè ïîâåëåâàåøü ïðîäàòü? ";
+    std::cout << "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸ Ð¿Ð¾Ð²ÐµÐ»ÐµÐ²Ð°ÐµÑˆÑŒ Ð¿Ñ€Ð¾Ð´Ð°Ñ‚ÑŒ? ";
     std::cin >> acres_to_sell;
 
     while (acres_to_sell < 0 || acres_to_sell >= new_city_.acres) {
-        std::cout << "Íåâåðíîå êîëè÷åñòâî àêðîâ çåìëè\n";
-        std::cout << "Ñêîëüêî àêðîâ çåìëè ïîâåëåâàåøü ïðîäàòü? ";
+        std::cout << "ÐÐµÐ²ÐµÑ€Ð½Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸\n";
+        std::cout << "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸ Ð¿Ð¾Ð²ÐµÐ»ÐµÐ²Ð°ÐµÑˆÑŒ Ð¿Ñ€Ð¾Ð´Ð°Ñ‚ÑŒ? ";
         std::cin >> acres_to_sell;
     }
 
@@ -50,12 +50,12 @@ GameRound& GameRound::SellAcres() {
 GameRound& GameRound::SetWheatsToEat() {
     Wheats wheats_to_eat;
 
-    std::cout << "Ñêîëüêî áóøåëåé ïøåíèöû ïîâåëåâàåøü ñúåñòü? ";
+    std::cout << "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð±ÑƒÑˆÐµÐ»ÐµÐ¹ Ð¿ÑˆÐµÐ½Ð¸Ñ†Ñ‹ Ð¿Ð¾Ð²ÐµÐ»ÐµÐ²Ð°ÐµÑˆÑŒ ÑÑŠÐµÑÑ‚ÑŒ? ";
     std::cin >> wheats_to_eat;
 
     while (wheats_to_eat < 0 || wheats_to_eat > new_city_.wheats) {
-        std::cout << "Íåâåðíîå êîëè÷åñòâî áóøåëåé ïøåíèöû\n";
-        std::cout << "Ñêîëüêî áóøåëåé ïøåíèöû ïîâåëåâàåøü ñúåñòü? ";
+        std::cout << "ÐÐµÐ²ÐµÑ€Ð½Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð±ÑƒÑˆÐµÐ»ÐµÐ¹ Ð¿ÑˆÐµÐ½Ð¸Ñ†Ñ‹\n";
+        std::cout << "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð±ÑƒÑˆÐµÐ»ÐµÐ¹ Ð¿ÑˆÐµÐ½Ð¸Ñ†Ñ‹ Ð¿Ð¾Ð²ÐµÐ»ÐµÐ²Ð°ÐµÑˆÑŒ ÑÑŠÐµÑÑ‚ÑŒ? ";
         std::cin >> wheats_to_eat;
     }
 
@@ -69,15 +69,15 @@ GameRound& GameRound::SetWheatsToEat() {
 GameRound& GameRound::SetAcresToProduction() {
     Acres acres_to_sow;
 
-    std::cout << "Ñêîëüêî àêðîâ çåìëè ïîâåëåâàåøü çàñåÿòü? ";
+    std::cout << "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸ Ð¿Ð¾Ð²ÐµÐ»ÐµÐ²Ð°ÐµÑˆÑŒ Ð·Ð°ÑÐµÑÑ‚ÑŒ? ";
     std::cin >> acres_to_sow;
 
     while (acres_to_sow < 0 ||
         acres_to_sow > new_city_.citizens * kAcresPerCitizen ||
         acres_to_sow / kAcrPerWheat > new_city_.wheats ||
         acres_to_sow > new_city_.acres) {
-        std::cout << "Íåâåðíîå êîëè÷åñòâî àêðîâ çåìëè\n";
-        std::cout << "Ñêîëüêî àêðîâ çåìëè ïîâåëåâàåøü çàñåÿòü? ";
+        std::cout << "ÐÐµÐ²ÐµÑ€Ð½Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸\n";
+        std::cout << "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð°ÐºÑ€Ð¾Ð² Ð·ÐµÐ¼Ð»Ð¸ Ð¿Ð¾Ð²ÐµÐ»ÐµÐ²Ð°ÐµÑˆÑŒ Ð·Ð°ÑÐµÑÑ‚ÑŒ? ";
         std::cin >> acres_to_sow;
     }
 
