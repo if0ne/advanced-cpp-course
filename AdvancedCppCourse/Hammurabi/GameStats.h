@@ -30,7 +30,8 @@ public:
 
     float sum_dead_citizens_procent;
 
-    void Print();
+    void PrintCurrentStats();
+    void PrintGreeting();
 };
 
 /*

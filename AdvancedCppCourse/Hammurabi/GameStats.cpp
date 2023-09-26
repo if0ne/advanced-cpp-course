@@ -1,22 +1,22 @@
 #include "GameStats.h"
 
-void GameStats::Print() {
-    if (round == 0) {
-        std::cout << "Ты повелитель великого города - Вавилона\n";
-        std::cout << "под твоим управлением "
-            << new_city.citizens
-            << " людей, "
-            << new_city.acres
-            << " акров земли и "
-            << new_city.wheats
-            << " бушелей пшеницы.\n"
-            << "Цена 1 акра земли "
-            << new_city.acr_price << " бушелей пшеницы."
-            << std::endl;
+void GameStats::PrintGreeting() {
+    std::cout << "Ты повелитель великого города - Вавилона\n";
+    std::cout << "под твоим управлением "
+        << new_city.citizens
+        << " людей, "
+        << new_city.acres
+        << " акров земли и "
+        << new_city.wheats
+        << " бушелей пшеницы.\n"
+        << "Цена 1 акра земли "
+        << new_city.acr_price << " бушелей пшеницы."
+        << std::endl;
 
-        return;
-    }
+    return;
+}
 
+void GameStats::PrintCurrentStats() {
     std::cout << "----------------------------------------\n";
     std::cout << "Мой повелитель, соизволь поведать тебе\n";
     std::cout << "в году " << round << " твоего высочайшего правления\n";

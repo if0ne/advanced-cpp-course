@@ -5,7 +5,12 @@ void HammurabiGame::Start() {
 
     do
     {
-        game_stats.Print();
+        if (round_ == 1) {
+            game_stats.PrintGreeting();
+        } else {
+            game_stats.PrintCurrentStats();
+        }
+        
 
         if (RequestToUserAction("Сохранить и выйти? (y/n) ")) {
             requeust_to_quit_ = true;
@@ -20,12 +25,11 @@ void HammurabiGame::Start() {
         round_ <= kMaxRound &&
         !requeust_to_quit_ &&
         game_stats.dead_percent < kSurvivedToLose
-        );
+    );
 
     if (game_stats.dead_percent >= kSurvivedToLose) {
         std::cout << "Вы проиграли на " << round_ << " году." << std::endl;
-    }
-    else {
+    } else {
         float p = game_stats.sum_dead_citizens_procent / kMaxRound;
         float l = city_.acres / city_.citizens;
 
