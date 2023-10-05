@@ -1,4 +1,4 @@
-#include "Array.h"
+#include "Vector.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -77,7 +77,7 @@ Array<T>::Array(array_size capacity) {
 }
 
 template<typename T>
-int Array<T>::insert(const T&& value) {
+int Array<T>::insert(const T& value) {
     if (size_ == capacity_) {
         grow();
     }
