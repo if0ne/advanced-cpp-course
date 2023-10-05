@@ -6,31 +6,29 @@ void HammurabiGame::Start() {
     do
     {
         if (round_ == 1) {
-            game_stats.PrintGreeting();
+            game_stats_.PrintGreeting();
         } else {
-            game_stats.PrintCurrentStats();
+            game_stats_.PrintCurrentStats();
         }
         
 
         if (RequestToUserAction("Сохранить и выйти? (y/n) ")) {
-            requeust_to_quit_ = true;
             Save();
             return;
         }
 
         GameRound round{ city_, round_ };
-        city_ = round.Run(game_stats);
+        city_ = round.Run(game_stats_);
         round_++;
     } while (
         round_ <= kMaxRound &&
-        !requeust_to_quit_ &&
-        game_stats.dead_percent < kSurvivedToLose
+        game_stats_.dead_percent < kSurvivedToLose
     );
 
-    if (game_stats.dead_percent >= kSurvivedToLose) {
+    if (game_stats_.dead_percent >= kSurvivedToLose) {
         std::cout << "Вы проиграли на " << round_ << " году." << std::endl;
     } else {
-        float p = game_stats.sum_dead_citizens_procent / kMaxRound;
+        float p = game_stats_.sum_dead_citizens_procent / kMaxRound;
         float l = city_.acres / city_.citizens;
 
         if (p > 0.33 && l < 0.07) {
@@ -72,17 +70,17 @@ void HammurabiGame::TryLoad() {
             >> city_.acres
             >> city_.wheats
             >> city_.acr_price
-            >> game_stats.round
-            >> game_stats.dead_citizens
-            >> game_stats.gathered_wheats
-            >> game_stats.dead_citizens
-            >> game_stats.new_citizens
-            >> game_stats.wheats_per_arc
-            >> game_stats.was_plague
-            >> game_stats.eaten_by_rats
-            >> game_stats.dead_percent
-            >> game_stats.sum_dead_citizens_procent;
-        game_stats.new_city = city_;
+            >> game_stats_.round
+            >> game_stats_.dead_citizens
+            >> game_stats_.gathered_wheats
+            >> game_stats_.dead_citizens
+            >> game_stats_.new_citizens
+            >> game_stats_.wheats_per_arc
+            >> game_stats_.was_plague
+            >> game_stats_.eaten_by_rats
+            >> game_stats_.dead_percent
+            >> game_stats_.sum_dead_citizens_procent;
+        game_stats_.new_city = city_;
 
         srand(seed_);
     }
@@ -102,16 +100,16 @@ void HammurabiGame::Save() {
         << city_.acres << " "
         << city_.wheats << " "
         << city_.acr_price << " "
-        << game_stats.round << " "
-        << game_stats.dead_citizens << " "
-        << game_stats.gathered_wheats << " "
-        << game_stats.dead_citizens << " "
-        << game_stats.new_citizens << " "
-        << game_stats.wheats_per_arc << " "
-        << game_stats.was_plague << " "
-        << game_stats.eaten_by_rats << " "
-        << game_stats.dead_percent << " "
-        << game_stats.sum_dead_citizens_procent;
+        << game_stats_.round << " "
+        << game_stats_.dead_citizens << " "
+        << game_stats_.gathered_wheats << " "
+        << game_stats_.dead_citizens << " "
+        << game_stats_.new_citizens << " "
+        << game_stats_.wheats_per_arc << " "
+        << game_stats_.was_plague << " "
+        << game_stats_.eaten_by_rats << " "
+        << game_stats_.dead_percent << " "
+        << game_stats_.sum_dead_citizens_procent;
 
     file.close();
 }

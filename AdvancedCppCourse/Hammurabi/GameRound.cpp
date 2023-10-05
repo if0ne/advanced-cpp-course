@@ -81,8 +81,6 @@ GameRound& GameRound::SetAcresToProduction() {
         std::cin >> acres_to_sow;
     }
 
-    new_city_.wheats -= acres_to_sow;
-
     acres_to_sow_ = acres_to_sow;
 
     return *this;
@@ -99,7 +97,7 @@ GameRound& GameRound::InputData() {
 GameRound& GameRound::SowWheats() {
     wheats_per_acr_ = random(1, 6);
     gathered_wheats_ = acres_to_sow_ * wheats_per_acr_;
-    new_city_.wheats = gathered_wheats_;
+    new_city_.wheats += gathered_wheats_;
 
     return *this;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <fstream>
 
 #include "City.h"
 #include "GameStats.h"

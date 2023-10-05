@@ -10,13 +10,12 @@ class HammurabiGame
 public:
     HammurabiGame() : 
         city_({ kStartCitizens, kStartAcres, kStartWheats }), 
-        game_stats({}),
+        game_stats_({}),
         seed_(time(nullptr)),
-        round_(1),
-        requeust_to_quit_(false)
+        round_(1)
     {
         srand(seed_);
-        game_stats.new_city = city_;
+        game_stats_.new_city = city_;
     }
 
     void Start();
@@ -31,7 +30,7 @@ private:
     const char* kSaveFilename = "stat.save";
 
     City city_;
-    GameStats game_stats;
+    GameStats game_stats_;
 
     int seed_;
     int round_;

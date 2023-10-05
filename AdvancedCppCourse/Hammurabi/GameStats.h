@@ -16,6 +16,7 @@ public:
         was_plague = false;
         eaten_by_rats = 0;
         sum_dead_citizens_procent = 0.0f;
+        dead_percent = 0.0f;
     }
 
     int round;
@@ -34,32 +35,34 @@ public:
     void PrintGreeting();
 };
 
-/*
-std::ifstream& operator>>(std::ifstream& in, GameStats& game_stats) {
-    in >> game_stats.round;
-    in >> game_stats.dead_citizens;
-    in >> game_stats.gathered_wheats;
-    in >> game_stats.dead_citizens;
-    in >> game_stats.new_citizens;
-    in >> game_stats.wheats_per_arc;
-    in >> game_stats.was_plague;
-    in >> game_stats.eaten_by_rats;
-    in >> game_stats.survived_percent;
+
+/*std::ifstream& operator>>(std::ifstream& in, GameStats& game_stats) {
+    in >> game_stats.round
+        >> game_stats.dead_citizens
+        >> game_stats.gathered_wheats
+        >> game_stats.dead_citizens
+        >> game_stats.new_citizens
+        >> game_stats.wheats_per_arc
+        >> game_stats.was_plague
+        >> game_stats.eaten_by_rats
+        >> game_stats.dead_percent
+        >> game_stats.sum_dead_citizens_procent;
 
     return in;
 }
 
 std::ofstream& operator<<(std::ofstream& out, GameStats& game_stats) {
-    out << game_stats.round;
-    out << game_stats.dead_citizens;
-    out << game_stats.gathered_wheats;
-    out << game_stats.dead_citizens;
-    out << game_stats.new_citizens;
-    out << game_stats.wheats_per_arc;
-    out << game_stats.was_plague;
-    out << game_stats.eaten_by_rats;
-    out << game_stats.survived_percent;
+    out
+        << game_stats.round << " "
+        << game_stats.dead_citizens << " "
+        << game_stats.gathered_wheats << " "
+        << game_stats.dead_citizens << " "
+        << game_stats.new_citizens << " "
+        << game_stats.wheats_per_arc << " "
+        << game_stats.was_plague << " "
+        << game_stats.eaten_by_rats << " "
+        << game_stats.dead_percent << " "
+        << game_stats.sum_dead_citizens_procent;
 
     return out;
-}
-*/
+}*/
