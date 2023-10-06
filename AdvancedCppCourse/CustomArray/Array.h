@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <utility>
 
 #if INTPTR_MAX == INT32_MAX
 typedef int32_t array_size;
@@ -42,7 +43,7 @@ private:
             {
             case FORWARD:
                 current_ = array.data_;
-                last_ = array.data_ + array.size_;
+                last_ = array.data_ + array.size_ - 1;
                 break;
 
             case BACKWARD:
@@ -63,7 +64,7 @@ private:
                 return current_ < last_;
 
             case BACKWARD:
-                return current_ >= last_;
+                return current_ > last_;
 
             default:
                 return false;
@@ -156,6 +157,18 @@ public:
         return size_ - 1;
     }
 
+    int insert(T&& value) {
+        if (size_ == capacity_) {
+            grow();
+        }
+
+        data_[size_] = std::move(value);
+
+        size_++;
+
+        return size_ - 1;
+    }
+
     int insert(array_size index, const T& value) {
         assert(index >= 0);
         assert(index < size_);
@@ -174,6 +187,24 @@ public:
         return size_ - 1;
     }
 
+    int insert(array_size index, T&& value) {
+        assert(index >= 0);
+        assert(index < size_);
+
+        if (size_ == capacity_) {
+            grow();
+        }
+
+        for (array_size i = size_; i > index; --i) {
+            data_[i] = data_[i - 1];
+        }
+
+        data_[index] = std::move(value);
+        size_++;
+
+        return size_ - 1;
+    }
+
     void remove(array_size index) {
         assert(index >= 0);
         assert(index < size_);
@@ -181,6 +212,8 @@ public:
         for (array_size i = index; i < size_; ++i) {
             data_[i] = data_[i + 1];
         }
+
+        size_--;
     }
 
     const T* begin() const {
