@@ -185,3 +185,34 @@ TEST(CustomArrayTest, MutateByIteratorTest) {
     EXPECT_EQ(a[1], 5);
     EXPECT_EQ(a[2], 6);
 }
+
+TEST(CustomArrayTest, CopyAssigment) {
+    Array<int> a{};
+
+    a.insert(1);
+    a.insert(2);
+    a.insert(3);
+
+    Array<int> b = a;
+
+    EXPECT_EQ(a.size(), b.size());
+    EXPECT_EQ(a.capacity(), b.capacity());
+    EXPECT_EQ(a[0], b[0]);
+    EXPECT_EQ(a[1], b[1]);
+    EXPECT_EQ(a[2], b[2]);
+}
+
+TEST(CustomArrayTest, MoveAssigment) {
+    Array<int> a{};
+
+    a.insert(1);
+    a.insert(2);
+    a.insert(3);
+
+    Array<int> b = std::move(a);
+
+    EXPECT_EQ(b[0], 1);
+    EXPECT_EQ(b[1], 2);
+    EXPECT_EQ(b[2], 3);
+    EXPECT_DEATH_IF_SUPPORTED(a.insert(0), "");
+}

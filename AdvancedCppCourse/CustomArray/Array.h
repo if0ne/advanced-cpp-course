@@ -116,11 +116,19 @@ private:
 
         assert(new_data);
 
-        memmove(new_data, data_, size_ * sizeof(T));
+        for (array_size i = 0; i < size_; ++i) {
+            new_data[i] = std::move(data_[i]);
+        }
 
         free(data_);
         data_ = new_data;
         capacity_ = new_capacity;
+    }
+
+    void swap(Array<T>& lhs, Array<T>& rhs) {
+        std::swap(lhs.data_, rhs.data_);
+        std::swap(lhs.size_, rhs.size_);
+        std::swap(lhs.capacity_, rhs.capacity_);
     }
 
 public:
@@ -137,6 +145,28 @@ public:
         size_ = 0;
     }
 
+    Array(const Array<T>& other) {
+        data_ = (T*)malloc(other.capacity_ * sizeof(T));
+
+        assert(data_);
+
+        for (array_size i = 0; i < other.size_; ++i) {
+            data_[i] = other.data_[i];
+        }
+
+        size_ = other.size_;
+        capacity_ = other.capacity_;
+    }
+
+    Array(Array<T>&& other) {
+        data_ = other.data_;
+        size_ = other.size_;
+        capacity_ = other.capacity_;
+
+        other.data_ = nullptr;
+    }
+
+
     array_size size() {
         return size_;
     }
@@ -146,6 +176,8 @@ public:
     }
 
     int insert(const T& value) {
+        assert(data_);
+
         if (size_ == capacity_) {
             grow();
         }
@@ -158,6 +190,8 @@ public:
     }
 
     int insert(T&& value) {
+        assert(data_);
+
         if (size_ == capacity_) {
             grow();
         }
@@ -170,6 +204,7 @@ public:
     }
 
     int insert(array_size index, const T& value) {
+        assert(data_);
         assert(index >= 0);
         assert(index < size_);
 
@@ -188,6 +223,7 @@ public:
     }
 
     int insert(array_size index, T&& value) {
+        assert(data_);
         assert(index >= 0);
         assert(index < size_);
 
@@ -206,6 +242,7 @@ public:
     }
 
     void remove(array_size index) {
+        assert(data_);
         assert(index >= 0);
         assert(index < size_);
 
@@ -233,32 +270,14 @@ public:
     }
 
     Array<T>& operator =(const Array<T>& other) {
-        if (this == &other) return *this;
-        ~Array();
-
-        data_ = (T*)malloc(other.capacity_ * sizeof(T));
-
-        assert(data_);
-
-        memcpy(data_, other.data_, other.size_ * sizeof(T));
-
-        size_ = other.size_;
-        capacity_ = other.capacity_;
+        swap(*this, other);
 
         return *this;
     }
 
     Array<T>& operator =(Array<T>&& other) {
-        if (this == &other) return *this;
-        ~Array();
-
-        data_ = other.data_;
-        size_ = other.size_;
-        capacity_ = other.capacity_;
-
-        other.data_ = nullptr;
-        other.size_ = 0;
-        other.capacity_ = 0;
+        Array<T> temp{ other };
+        swap(*this, temp);
 
         return *this;
     }
@@ -294,6 +313,10 @@ public:
     }
 
     ~Array() {
+        if (!data_) {
+            return;
+        }
+
         for (array_size i = 0; i < size_; ++i) {
             data_[i].~T();
         }
