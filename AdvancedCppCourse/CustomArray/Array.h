@@ -246,8 +246,10 @@ public:
         assert(index >= 0);
         assert(index < size_);
 
+        data_[index].~T();
+
         for (array_size i = index; i < size_; ++i) {
-            data_[i] = data_[i + 1];
+            data_[i] = std::move(data_[i + 1]);
         }
 
         size_--;
