@@ -117,7 +117,7 @@ private:
         assert(new_data);
 
         for (array_size i = 0; i < size_; ++i) {
-            new_data[i] = std::move(data_[i]);
+            new (new_data + i) T(std::move(data_[i]));
         }
 
         free(data_);

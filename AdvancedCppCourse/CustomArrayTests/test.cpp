@@ -216,6 +216,36 @@ TEST(CustomArrayTest, CheckCapacityGrow) {
     EXPECT_EQ(a.capacity(), 4);
 }
 
+TEST(CustomArrayTest, CheckCapacityGrowWithClasss) {
+    int i = 0;
+
+    Array<SupportClass > a{ 1 };
+
+    a.insert(SupportClass{ &i });
+
+    EXPECT_EQ(a.size(), 1);
+    EXPECT_EQ(a.capacity(), 1);
+    EXPECT_EQ(i, 1);
+
+    a.insert(SupportClass{ &i });
+
+    EXPECT_EQ(a.size(), 2);
+    EXPECT_EQ(a.capacity(), 2);
+    EXPECT_EQ(i, 2);
+
+    a.insert(SupportClass{ &i });
+
+    EXPECT_EQ(a.size(), 3);
+    EXPECT_EQ(a.capacity(), 4);
+    EXPECT_EQ(i, 3);
+
+    a.insert(SupportClass{ &i });
+
+    EXPECT_EQ(a.size(), 4);
+    EXPECT_EQ(a.capacity(), 4);
+    EXPECT_EQ(i, 4);
+}
+
 TEST(CustomArrayTest, IteratorTest) {
     Array<int> a{};
 
