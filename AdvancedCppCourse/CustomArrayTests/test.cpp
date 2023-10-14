@@ -82,6 +82,12 @@ TEST(CustomArrayTest, CheckCapacityGrow) {
 TEST(CustomArrayTest, CheckDestructorCall) {
     class SupportClass {
     public:
+        SupportClass(const SupportClass& other) : i(other.i) {}
+        SupportClass(SupportClass&& other) {
+            i = other.i;
+            other.i = nullptr;
+        }
+
         SupportClass(int* i) : i(i) {
         }
 
@@ -90,14 +96,11 @@ TEST(CustomArrayTest, CheckDestructorCall) {
         }
 
         SupportClass& operator=(const SupportClass& other) {
-            i = other.i;
-            return *this;
+            return SupportClass(other);
         }
 
         SupportClass& operator=(SupportClass&& other) {
-            i = other.i;
-            other.i = nullptr;
-            return *this;
+            return SupportClass(other);
         }
 
     private:

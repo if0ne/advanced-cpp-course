@@ -182,7 +182,7 @@ public:
             grow();
         }
 
-        data_[size_] = value;
+        new (data_ + size_) T(value);
 
         size_++;
 
@@ -196,7 +196,7 @@ public:
             grow();
         }
 
-        data_[size_] = std::move(value);
+        new (data_ + size_) T(std::move(value));
 
         size_++;
 
@@ -213,10 +213,10 @@ public:
         }
 
         for (array_size i = size_; i > index; --i) {
-            data_[i] = data_[i - 1];
+            data_[i] = std::move(data_[i - 1]);
         }
 
-        new (data_ + size_) T(value);
+        new (data_ + index) T(value);
         size_++;
 
         return size_ - 1;
@@ -232,10 +232,10 @@ public:
         }
 
         for (array_size i = size_; i > index; --i) {
-            data_[i] = data_[i - 1];
+            data_[i] = std::move(data_[i - 1]);
         }
 
-        data_[index] = std::move(value);
+        new (data_ + index) T(std::move(value));
         size_++;
 
         return size_ - 1;
