@@ -216,7 +216,7 @@ public:
             data_[i] = data_[i - 1];
         }
 
-        data_[index] = value;
+        new (data_ + size_) T(value);
         size_++;
 
         return size_ - 1;
