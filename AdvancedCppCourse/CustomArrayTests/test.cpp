@@ -69,12 +69,13 @@ TEST(CustomArrayTest, InsertBackCopyClassTest) {
     {
         Array<SupportClass> a{};
 
+        a.insert(foo);
         a.insert(SupportClass{ foo });
         a.insert(SupportClass{ foo });
         a.insert(SupportClass{ foo });
 
-        EXPECT_EQ(a.size(), 3);
-        EXPECT_EQ(i, 4);
+        EXPECT_EQ(a.size(), 4);
+        EXPECT_EQ(i, 5);
     }
 
     EXPECT_EQ(i, 1);
@@ -117,12 +118,13 @@ TEST(CustomArrayTest, InsertInMiddleCopyClassTest) {
     {
         Array<SupportClass> a{};
 
+        a.insert(foo);
         a.insert(SupportClass{ &i });
         a.insert(SupportClass{ &i });
         a.insert(1, SupportClass{ foo });
 
-        EXPECT_EQ(a.size(), 3);
-        EXPECT_EQ(i, 4);
+        EXPECT_EQ(a.size(), 4);
+        EXPECT_EQ(i, 5);
     }
 
     EXPECT_EQ(i, 1);

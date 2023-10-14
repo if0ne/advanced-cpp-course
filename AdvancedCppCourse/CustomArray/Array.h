@@ -118,6 +118,7 @@ private:
 
         for (array_size i = 0; i < size_; ++i) {
             new (new_data + i) T(std::move(data_[i]));
+            data_[i].~T();
         }
 
         free(data_);
@@ -134,7 +135,7 @@ private:
 public:
     Array() : Array(kDefaultCapacity) {}
 
-    Array(array_size capacity) {
+    explicit Array(array_size capacity) {
         assert(capacity > 0);
 
         data_ = (T*)malloc(capacity * sizeof(T));
@@ -165,7 +166,6 @@ public:
 
         other.data_ = nullptr;
     }
-
 
     array_size size() {
         return size_;
@@ -213,7 +213,8 @@ public:
         }
 
         for (array_size i = size_; i > index; --i) {
-            data_[i] = std::move(data_[i - 1]);
+            new (data_ + i) T(std::move(data_[i - 1]));
+            data_[i - 1].~T();
         }
 
         new (data_ + index) T(value);
@@ -233,6 +234,7 @@ public:
 
         for (array_size i = size_; i > index; --i) {
             new (data_ + i) T(std::move(data_[i - 1]));
+            data_[i - 1].~T();
         }
 
         new (data_ + index) T(std::move(value));
@@ -250,6 +252,7 @@ public:
 
         for (array_size i = index; i < size_; ++i) {
             new (data_ + i) T(std::move(data_[i + 1]));
+            data_[i + 1].~T();
         }
 
         size_--;
@@ -272,7 +275,8 @@ public:
     }
 
     Array<T>& operator =(const Array<T>& other) {
-        swap(*this, other);
+        Array<T> temp{ other };
+        swap(*this, temp);
 
         return *this;
     }
