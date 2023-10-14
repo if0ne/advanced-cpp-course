@@ -2,10 +2,10 @@
 #include <utility>
 
 template<typename T>
-void swap(T& left, T& right) {
+void swap(T* left, T* right) {
     auto temp = std::move(left);
-    left = std::move(right);
-    right = std::move(temp);
+    new (left) T(std::move(right));
+    new (right) T(std::move(&temp));
 }
 
 template<typename T, typename Compare>
@@ -15,15 +15,15 @@ T* select_pivot(T* first, T* last, Compare comp) {
     T& middle_pivot = *(first + (last - first) / 2);
 
     if (comp(first_pivot, middle_pivot)) {
-        swap(first_pivot, middle_pivot);
+        swap(&first_pivot, &middle_pivot);
     }
 
     if (comp(middle_pivot, last_pivot)) {
-        swap(middle_pivot, last_pivot);
+        swap(&middle_pivot, &last_pivot);
     }
 
     if (comp(first_pivot, middle_pivot)) {
-        swap(first_pivot, middle_pivot);
+        swap(&first_pivot, &middle_pivot);
     }
 
     return &middle_pivot;
@@ -36,7 +36,7 @@ void partition(T* first, T* last, T* pivot, Compare comp) {
         while (comp(*pivot, *last)) last--;
 
         if (first <= last) {
-            swap(*first, *last);
+            swap(first, last);
 
             if (first == pivot) {
                 pivot = last;

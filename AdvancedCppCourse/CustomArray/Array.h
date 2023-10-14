@@ -151,7 +151,7 @@ public:
         assert(data_);
 
         for (array_size i = 0; i < other.size_; ++i) {
-            data_[i] = other.data_[i];
+            new (data_ + i) T(other.data_[i]);
         }
 
         size_ = other.size_;
@@ -232,7 +232,7 @@ public:
         }
 
         for (array_size i = size_; i > index; --i) {
-            data_[i] = std::move(data_[i - 1]);
+            new (data_ + i) T(std::move(data_[i - 1]));
         }
 
         new (data_ + index) T(std::move(value));
@@ -249,7 +249,7 @@ public:
         data_[index].~T();
 
         for (array_size i = index; i < size_; ++i) {
-            data_[i] = std::move(data_[i + 1]);
+            new (data_ + i) T(std::move(data_[i + 1]));
         }
 
         size_--;

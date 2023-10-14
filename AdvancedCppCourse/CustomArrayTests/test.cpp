@@ -1,6 +1,37 @@
 #include "pch.h"
 #include "../CustomArray/Array.h"
 
+class SupportClass {
+public:
+    SupportClass(const SupportClass& other) : i(other.i) { 
+        *i += 1;
+    }
+
+    SupportClass(SupportClass&& other) {
+        i = other.i;
+        other.i = nullptr;
+    }
+
+    SupportClass(int* i) : i(i) {
+        *i += 1;
+    }
+
+    ~SupportClass() {
+        if (i) *i -= 1;
+    }
+
+    SupportClass& operator=(const SupportClass& other) {
+        return SupportClass(other);
+    }
+
+    SupportClass& operator=(SupportClass&& other) {
+        return SupportClass(other);
+    }
+
+private:
+    int* i;
+};
+
 TEST(CustomArrayTest, InsertBackTest) {
     Array<int> a{};
 
@@ -14,6 +45,41 @@ TEST(CustomArrayTest, InsertBackTest) {
     EXPECT_EQ(a[2], 3);
 }
 
+TEST(CustomArrayTest, InsertBackClassTest) {
+    int i = 0;
+
+    {
+        Array<SupportClass> a{};
+
+        a.insert(SupportClass{ &i });
+        a.insert(SupportClass{ &i });
+        a.insert(SupportClass{ &i });
+
+        EXPECT_EQ(a.size(), 3);
+        EXPECT_EQ(i, 3);
+    }
+
+    EXPECT_EQ(i, 0);
+}
+
+TEST(CustomArrayTest, InsertBackCopyClassTest) {
+    int i = 0;
+
+    SupportClass foo = SupportClass{ &i };
+    {
+        Array<SupportClass> a{};
+
+        a.insert(SupportClass{ foo });
+        a.insert(SupportClass{ foo });
+        a.insert(SupportClass{ foo });
+
+        EXPECT_EQ(a.size(), 3);
+        EXPECT_EQ(i, 4);
+    }
+
+    EXPECT_EQ(i, 1);
+}
+
 TEST(CustomArrayTest, InsertInMiddleTest) {
     Array<int> a{};
 
@@ -25,6 +91,41 @@ TEST(CustomArrayTest, InsertInMiddleTest) {
     EXPECT_EQ(a[0], 1);
     EXPECT_EQ(a[1], 2);
     EXPECT_EQ(a[2], 3);
+}
+
+TEST(CustomArrayTest, InsertInMiddleClassTest) {
+    int i = 0;
+
+    {
+        Array<SupportClass> a{};
+
+        a.insert(SupportClass{ &i });
+        a.insert(SupportClass{ &i });
+        a.insert(1, SupportClass{ &i });
+
+        EXPECT_EQ(a.size(), 3);
+        EXPECT_EQ(i, 3);
+    }
+
+    EXPECT_EQ(i, 0);
+}
+
+TEST(CustomArrayTest, InsertInMiddleCopyClassTest) {
+    int i = 0;
+
+    SupportClass foo = SupportClass{ &i };
+    {
+        Array<SupportClass> a{};
+
+        a.insert(SupportClass{ &i });
+        a.insert(SupportClass{ &i });
+        a.insert(1, SupportClass{ foo });
+
+        EXPECT_EQ(a.size(), 3);
+        EXPECT_EQ(i, 4);
+    }
+
+    EXPECT_EQ(i, 1);
 }
 
 TEST(CustomArrayTest, RemoveFromEndTest) {
@@ -55,6 +156,42 @@ TEST(CustomArrayTest, RemoveFromMiddleTest) {
     EXPECT_EQ(a[1], 3);
 }
 
+TEST(CustomArrayTest, RemoveFromEndClassTest) {
+    int i = 0;
+
+    {
+        Array<SupportClass> a{};
+
+        a.insert(SupportClass { &i });
+        a.insert(SupportClass { &i });
+        a.insert(SupportClass { &i });
+
+        a.remove(2);
+        EXPECT_EQ(a.size(), 2);
+        EXPECT_EQ(i, 2);
+    }
+    
+    EXPECT_EQ(i, 0);
+}
+
+TEST(CustomArrayTest, RemoveFromMiddleClassTest) {
+    int i = 0;
+
+    {
+        Array<SupportClass> a{};
+
+        a.insert(SupportClass{ &i });
+        a.insert(SupportClass{ &i });
+        a.insert(SupportClass{ &i });
+
+        a.remove(1);
+        EXPECT_EQ(a.size(), 2);
+        EXPECT_EQ(i, 2);
+    }
+
+    EXPECT_EQ(i, 0);
+}
+
 TEST(CustomArrayTest, CheckCapacityGrow) {
     Array<int> a{1};
 
@@ -77,46 +214,6 @@ TEST(CustomArrayTest, CheckCapacityGrow) {
 
     EXPECT_EQ(a.size(), 4);
     EXPECT_EQ(a.capacity(), 4);
-}
-
-TEST(CustomArrayTest, CheckDestructorCall) {
-    class SupportClass {
-    public:
-        SupportClass(const SupportClass& other) : i(other.i) {}
-        SupportClass(SupportClass&& other) {
-            i = other.i;
-            other.i = nullptr;
-        }
-
-        SupportClass(int* i) : i(i) {
-        }
-
-        ~SupportClass() {
-            if (i) *i += 1;
-        }
-
-        SupportClass& operator=(const SupportClass& other) {
-            return SupportClass(other);
-        }
-
-        SupportClass& operator=(SupportClass&& other) {
-            return SupportClass(other);
-        }
-
-    private:
-        int* i;
-    };
-
-    int i = 0;
-
-    {
-        Array<SupportClass> a{};
-        a.insert(SupportClass{ &i });
-        a.insert(SupportClass{ &i });
-        a.insert(SupportClass{ &i });
-    }
-
-    EXPECT_EQ(i, 3);
 }
 
 TEST(CustomArrayTest, IteratorTest) {
