@@ -53,8 +53,8 @@ void partition(T* first, T* last, T* pivot, Compare comp) {
 }
 
 template<typename T, typename Compare>
-void quick_sort_modified(T* first, T* last, Compare comp) {
-    const int INSERTION_SORT_THRESHOLD = 64;
+void quick_sort_optimized(T* first, T* last, Compare comp) {
+    const int INSERTION_SORT_THRESHOLD = 32;
     if (first >= last) {
         return;
     }
@@ -68,42 +68,12 @@ void quick_sort_modified(T* first, T* last, Compare comp) {
     partition(first, last, pivot, comp);
     
     if (pivot - first < last - pivot) {
-        quick_sort_iterative(pivot + 1, last, comp);
         quick_sort(first, pivot - 1, comp);
+        first = pivot + 1;
     } else {
-        quick_sort_iterative(first, pivot - 1, comp);
         quick_sort(pivot + 1, last, comp);
+        last = pivot - 1;
     }
-}
-
-template<typename T, typename Compare>
-void quick_sort_iterative(T* first, T* last, Compare comp) {
-    T** stack = new T*[last - first + 1];
-
-    int top = 0;
-
-    stack[top++] = first;
-    stack[top++] = last;
-
-    while (top > 0) {
-        T* l = stack[--top];
-        T* f = stack[--top];
-
-        T* p = select_pivot(f, l, comp);
-        partition(f, l, p, comp);
-
-        if (p - 1 > f) {
-            stack[top++] = f;
-            stack[top++] = p - 1;
-        }
-
-        if (p + 1 < l) {
-            stack[top++] = p + 1;
-            stack[top++] = l;
-        }
-    }
-
-    delete[] stack;
 }
 
 template<typename T, typename Compare>
@@ -115,8 +85,14 @@ void quick_sort(T* first, T* last, Compare comp) {
     T* pivot = select_pivot(first, last, comp);
     partition(first, last, pivot, comp);
 
-    quick_sort(first, pivot - 1, comp);
-    quick_sort(pivot + 1, last, comp);
+    if (pivot - first < last - pivot) {
+        quick_sort(first, pivot - 1, comp);
+        first = pivot + 1;
+    }
+    else {
+        quick_sort(pivot + 1, last, comp);
+        last = pivot - 1;
+    }
 }
 
 template<typename T, typename Compare>

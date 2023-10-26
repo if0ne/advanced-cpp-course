@@ -1,39 +1,102 @@
 #include "Quicksort.h"
+
+#include <cstdlib>
 #include <chrono>
 #include <iostream>
 #include <vector>
 
-template <
-    class result_t = std::chrono::microseconds,
-    class clock_t = std::chrono::steady_clock,
-    class duration_t = std::chrono::milliseconds
->
-auto since(std::chrono::time_point<clock_t, duration_t> const& start)
-{
-    return std::chrono::duration_cast<result_t>(clock_t::now() - start);
-}
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 std::vector<int> generate(int n) {
+    const int kMaxInt = 1 << 20;
     std::vector<int> foo;
 
     for (int i = 0; i < n; i++) {
-        foo.push_back(n - i);
+        foo.push_back(rand() % kMaxInt);
     }
 
     return foo;
 }
 
+void warmup(int iters) {
+    std::cout << "Begin Warmup\n";
+
+    const int kWarmupItemCount = 1000;
+    srand(time(nullptr));
+
+    for (int i = 0; i < iters; ++i) {
+        auto items = generate(kWarmupItemCount);
+        quick_sort_optimized(items.data(), items.data() + kWarmupItemCount - 1, [](int a, int b) {
+            return a < b;
+        });
+    }
+
+    std::cout << "End Warmup\n";
+}
+
+template<typename Function>
+double iter(Function func, std::vector<int>& data) {
+    auto t1 = high_resolution_clock::now();
+    func(data);
+    auto t2 = high_resolution_clock::now();
+
+    duration<double, std::micro> delta = t2 - t1;
+
+    return delta.count();
+}
+
+template<typename Function>
+double bench(Function func, int sample_size, int data_size) {
+    double all_time = 0.0;
+
+    for (int i = 0; i < sample_size; i++) {
+        auto data = generate(data_size);
+        all_time += iter(func, data);
+    }
+
+    return all_time / sample_size;
+}
+
+template<typename Function>
+std::vector<double> bench_group(Function func, const std::vector<int>& inputs) {
+    const int SAMPLE_SIZE = 10;
+    std::vector<double> results;
+
+    for (auto i : inputs) {
+        results.push_back(bench(func, SAMPLE_SIZE, i));
+    }
+
+    return results;
+}
+
 int main() {
-    auto a = generate(10000);
-    auto b = generate(10000);
+    const int kWarmupIters = 100;
+    std::vector<int> inputs = { 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024 };
 
-    auto start = std::chrono::steady_clock::now();
-    quick_sort(a.data(), a.data() + a.size() - 1, [](int a, int b) { return a < b; });
-    std::cout << "Elapsed(us)=" << since(start).count() << std::endl;
+    warmup(kWarmupIters);
 
-    start = std::chrono::steady_clock::now();
-    quick_sort_modified(b.data(), b.data() + b.size() - 1, [](int a, int b) { return a < b; });
-    std::cout << "Elapsed(us)=" << since(start).count() << std::endl;
+    auto quick_sort_results = bench_group([](std::vector<int>& data) {
+        quick_sort(data.data(), data.data() + data.size() - 1, [](int a, int b) { return a < b; });
+    }, inputs);
 
-    int c = 0;
+    auto insertion_sort_results = bench_group([](std::vector<int>& data) {
+        insertion_sort(data.data(), data.data() + data.size() - 1, [](int a, int b) { return a < b; });
+    }, inputs);
+
+    std::cout << "QuickSort:\n";
+
+    for (int i = 0; i < inputs.size(); i++) {
+        std::cout << "N = " << inputs[i] << " ; Time(us) = " << quick_sort_results[i] << "\n";
+    }
+
+    std::cout << "\n===============================\n\n";
+
+    std::cout << "Insertion Sort: \n";
+
+    for (int i = 0; i < inputs.size(); i++) {
+        std::cout << "N = " << inputs[i] << " ; Time(us) = " << insertion_sort_results[i] << "\n";
+    }
 }
