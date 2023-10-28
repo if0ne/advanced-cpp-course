@@ -40,10 +40,11 @@ double bench(Function func, int sample_size, int data_size) {
     double all_time = 0.0;
 
     for (int i = 0; i < sample_size; i++) {
+        // TODO: Remove generate
         auto data = generate(data_size);
         all_time += iter(func, data);
     }
-
+    
     return all_time / sample_size;
 }
 

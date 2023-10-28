@@ -161,3 +161,9 @@ TEST(QuickSort, QuickSortEmptyTest) {
     quickSortOptimized(a.data(), a.data(), compareIntAsc);
     EXPECT_TRUE(a.empty());
 }
+
+TEST(QuickSort, QuickSortOnesTest) {
+    std::vector<int> a(1000, 1);
+
+    quickSortOptimized(a.data(), a.data() + a.size() - 1, compareIntAsc);
+}

@@ -10,7 +10,7 @@ std::vector<int> generate(int n) {
     std::vector<int> foo;
 
     for (int i = 0; i < n; i++) {
-        foo.push_back(rand() % kMaxInt);
+        foo.push_back(n - i);
     }
 
     return foo;
@@ -113,10 +113,13 @@ void quickSort(T* first, T* last, Compare comp) {
 template<typename T, typename Compare>
 void insertionSort(T* first, T* last, Compare comp) {
     for (T* i = first + 1; i <= last; i++) {
+        T* value = i;
         T* j = i;
-        while (j > first && comp(*j, *(j - 1))) {
-            swap(*j, *(j - 1));
+        while (j > first && comp(*value, *(j - 1))) {
+            new (j) T(std::move(*(j - 1)));
             j--;
         }
+
+        new (j) T(std::move(*value));
     }
 }
