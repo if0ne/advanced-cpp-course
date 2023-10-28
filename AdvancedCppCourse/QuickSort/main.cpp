@@ -1,25 +1,12 @@
 #include "Quicksort.h"
 
-#include <cstdlib>
 #include <chrono>
 #include <iostream>
-#include <vector>
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
 using std::chrono::duration;
 using std::chrono::milliseconds;
-
-std::vector<int> generate(int n) {
-    const int kMaxInt = 1 << 20;
-    std::vector<int> foo;
-
-    for (int i = 0; i < n; i++) {
-        foo.push_back(rand() % kMaxInt);
-    }
-
-    return foo;
-}
 
 void warmup(int iters) {
     std::cout << "Begin Warmup\n";
