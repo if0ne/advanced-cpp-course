@@ -24,7 +24,7 @@ void swap(T& left, T& right) {
 }
 
 template<typename T, typename Compare>
-T* select_pivot(T* first, T* last, Compare comp) {
+T* selectPivot(T* first, T* last, Compare comp) {
     T& first_pivot = *first;
     T& last_pivot = *last;
     T& middle_pivot = *(first + (last - first) / 2);
@@ -46,7 +46,7 @@ T* select_pivot(T* first, T* last, Compare comp) {
 
 template<typename T, typename Compare>
 T* partition(T* first, T* last, Compare comp) {
-    T* pivot = select_pivot(first, last, comp);
+    T* pivot = selectPivot(first, last, comp);
     swap(*pivot, *last);
     pivot = last;
 
@@ -73,11 +73,11 @@ T* partition(T* first, T* last, Compare comp) {
 }
 
 template<typename T, typename Compare>
-void quick_sort_optimized(T* first, T* last, Compare comp) {
+void quickSortOptimized(T* first, T* last, Compare comp) {
     const int INSERTION_SORT_THRESHOLD = 128;
 
     if (last - first < INSERTION_SORT_THRESHOLD) {
-        insertion_sort(first, last, comp);
+        insertionSort(first, last, comp);
         return;
     }
 
@@ -85,33 +85,33 @@ void quick_sort_optimized(T* first, T* last, Compare comp) {
         T* pivot = partition(first, last, comp);
 
         if (pivot - first < last - pivot) {
-            quick_sort_optimized(first, pivot - 1, comp);
+            quickSortOptimized(first, pivot - 1, comp);
             first = pivot + 1;
         } else {
-            quick_sort_optimized(pivot + 1, last, comp);
+            quickSortOptimized(pivot + 1, last, comp);
             last = pivot - 1;
         }
     }
 }
 
 template<typename T, typename Compare>
-void quick_sort(T* first, T* last, Compare comp) {
+void quickSort(T* first, T* last, Compare comp) {
     while (first < last) {
         T* pivot = partition(first, last, comp);
 
         if (pivot - first < last - pivot) {
-            quick_sort(first, pivot - 1, comp);
+            quickSort(first, pivot - 1, comp);
             first = pivot + 1;
         }
         else {
-            quick_sort(pivot + 1, last, comp);
+            quickSort(pivot + 1, last, comp);
             last = pivot - 1;
         }
     }
 }
 
 template<typename T, typename Compare>
-void insertion_sort(T* first, T* last, Compare comp) {
+void insertionSort(T* first, T* last, Compare comp) {
     for (T* i = first + 1; i <= last; i++) {
         T* j = i;
         while (j > first && comp(*j, *(j - 1))) {

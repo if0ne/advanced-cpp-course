@@ -68,8 +68,8 @@ bool compareIntDesc(int a, int b) {
 TEST(SelectPivot, FirstElementAsPivotTest) {
     std::vector<int> a = { 2, 3, 1 };
 
-    int* pivot1 = select_pivot(a.data(), a.data() + a.size() - 1, compareIntAsc);
-    int* pivot2 = select_pivot(a.data(), a.data() + a.size() - 1, compareIntDesc);
+    int* pivot1 = selectPivot(a.data(), a.data() + a.size() - 1, compareIntAsc);
+    int* pivot2 = selectPivot(a.data(), a.data() + a.size() - 1, compareIntDesc);
 
     EXPECT_EQ(pivot1, pivot2);
     EXPECT_EQ(*pivot1, 2);
@@ -79,8 +79,8 @@ TEST(SelectPivot, FirstElementAsPivotTest) {
 TEST(SelectPivot, LastElementAsPivotTest) {
     std::vector<int> a = { 1, 3, 2 };
 
-    int* pivot1 = select_pivot(a.data(), a.data() + a.size() - 1, compareIntAsc);
-    int* pivot2 = select_pivot(a.data(), a.data() + a.size() - 1, compareIntDesc);
+    int* pivot1 = selectPivot(a.data(), a.data() + a.size() - 1, compareIntAsc);
+    int* pivot2 = selectPivot(a.data(), a.data() + a.size() - 1, compareIntDesc);
 
     EXPECT_EQ(pivot1, pivot2);
     EXPECT_EQ(*pivot1, 2);
@@ -90,8 +90,8 @@ TEST(SelectPivot, LastElementAsPivotTest) {
 TEST(SelectPivot, MiddleElementAsPivotTest) {
     std::vector<int> a = { 1, 2, 3 };
 
-    int* pivot1 = select_pivot(a.data(), a.data() + a.size() - 1, compareIntAsc);
-    int* pivot2 = select_pivot(a.data(), a.data() + a.size() - 1, compareIntDesc);
+    int* pivot1 = selectPivot(a.data(), a.data() + a.size() - 1, compareIntAsc);
+    int* pivot2 = selectPivot(a.data(), a.data() + a.size() - 1, compareIntDesc);
 
     EXPECT_EQ(pivot1, pivot2);
     EXPECT_EQ(*pivot1, 2);
@@ -115,7 +115,7 @@ TEST(Partition, PartitionTest) {
 TEST(InsertionSort, InsertionSortAscTest) {
     std::vector<int> a = generate(1000);
 
-    insertion_sort(a.data(), a.data() + a.size() - 1, compareIntAsc);
+    insertionSort(a.data(), a.data() + a.size() - 1, compareIntAsc);
     for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
         EXPECT_LE(*i, *(i + 1));
     }
@@ -124,7 +124,7 @@ TEST(InsertionSort, InsertionSortAscTest) {
 TEST(InsertionSort, InsertionSortDescTest) {
     std::vector<int> a = generate(1000);
 
-    insertion_sort(a.data(), a.data() + a.size() - 1, compareIntDesc);
+    insertionSort(a.data(), a.data() + a.size() - 1, compareIntDesc);
     for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
         EXPECT_GE(*i, *(i + 1));
     }
@@ -133,14 +133,14 @@ TEST(InsertionSort, InsertionSortDescTest) {
 TEST(InsertionSort, InsertionSortEmptyTest) {
     std::vector<int> a;
 
-    insertion_sort(a.data(), a.data(), compareIntAsc);
+    insertionSort(a.data(), a.data(), compareIntAsc);
     EXPECT_TRUE(a.empty());
 }
 
 TEST(QuickSort, QuickSortAscTest) {
     std::vector<int> a = generate(1000);
 
-    quick_sort(a.data(), a.data() + a.size() - 1, compareIntAsc);
+    quickSort(a.data(), a.data() + a.size() - 1, compareIntAsc);
     for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
         EXPECT_LE(*i, *(i + 1));
     }
@@ -149,7 +149,7 @@ TEST(QuickSort, QuickSortAscTest) {
 TEST(QuickSort, QuickSortDescTest) {
     std::vector<int> a = generate(1000);
 
-    quick_sort_optimized(a.data(), a.data() + a.size() - 1, compareIntDesc);
+    quickSortOptimized(a.data(), a.data() + a.size() - 1, compareIntDesc);
     for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
         EXPECT_GE(*i, *(i + 1));
     }
@@ -158,6 +158,6 @@ TEST(QuickSort, QuickSortDescTest) {
 TEST(QuickSort, QuickSortEmptyTest) {
     std::vector<int> a;
 
-    quick_sort_optimized(a.data(), a.data(), compareIntAsc);
+    quickSortOptimized(a.data(), a.data(), compareIntAsc);
     EXPECT_TRUE(a.empty());
 }

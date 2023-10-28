@@ -16,7 +16,7 @@ void warmup(int iters) {
 
     for (int i = 0; i < iters; ++i) {
         auto items = generate(kWarmupItemCount);
-        quick_sort_optimized(items.data(), items.data() + kWarmupItemCount - 1, [](int a, int b) {
+        quickSortOptimized(items.data(), items.data() + kWarmupItemCount - 1, [](int a, int b) {
             return a < b;
         });
     }
@@ -48,7 +48,7 @@ double bench(Function func, int sample_size, int data_size) {
 }
 
 template<typename Function>
-std::vector<double> bench_group(Function func, const std::vector<int>& inputs) {
+std::vector<double> benchGroup(Function func, const std::vector<int>& inputs) {
     const int SAMPLE_SIZE = 10;
     std::vector<double> results;
 
@@ -65,12 +65,12 @@ int main() {
 
     warmup(kWarmupIters);
 
-    auto quick_sort_results = bench_group([](std::vector<int>& data) {
-        quick_sort(data.data(), data.data() + data.size() - 1, [](int a, int b) { return a < b; });
+    auto quick_sort_results = benchGroup([](std::vector<int>& data) {
+        quickSort(data.data(), data.data() + data.size() - 1, [](int a, int b) { return a < b; });
     }, inputs);
 
-    auto insertion_sort_results = bench_group([](std::vector<int>& data) {
-        insertion_sort(data.data(), data.data() + data.size() - 1, [](int a, int b) { return a < b; });
+    auto insertion_sort_results = benchGroup([](std::vector<int>& data) {
+        insertionSort(data.data(), data.data() + data.size() - 1, [](int a, int b) { return a < b; });
     }, inputs);
 
     std::cout << "QuickSort:\n";
