@@ -137,6 +137,15 @@ TEST(InsertionSort, InsertionSortEmptyTest) {
     EXPECT_TRUE(a.empty());
 }
 
+TEST(InsertionSort, InsertionSortRandomTest) {
+    std::vector<int> a = generate_rand(1 << 12);
+
+    insertionSort(a.data(), a.data() + a.size() - 1, compareIntDesc);
+    for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
+        EXPECT_GE(*i, *(i + 1));
+    }
+}
+
 TEST(QuickSort, QuickSortAscTest) {
     std::vector<int> a = generate(1000);
 
@@ -167,3 +176,12 @@ TEST(QuickSort, QuickSortOnesTest) {
 
     quickSortOptimized(a.data(), a.data() + a.size() - 1, compareIntAsc);
 }
+
+TEST(QuickSort, QuickSortRandTest) {
+    std::vector<int> a = generate_rand(1 << 12);
+
+    insertionSort(a.data(), a.data() + a.size() - 1, compareIntDesc);
+    for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
+        EXPECT_GE(*i, *(i + 1));
+    }
+ }

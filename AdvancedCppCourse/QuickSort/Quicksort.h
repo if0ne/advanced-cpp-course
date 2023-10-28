@@ -6,11 +6,21 @@
 
 std::vector<int> generate(int n) {
     //srand(time(nullptr));
-    const int kMaxInt = 1 << 20;
     std::vector<int> foo;
 
     for (int i = 0; i < n; i++) {
         foo.push_back(n - i);
+    }
+
+    return foo;
+}
+
+std::vector<int> generate_rand(int n) {
+    srand(time(nullptr));
+    std::vector<int> foo;
+
+    for (int i = 0; i < n; i++) {
+        foo.push_back(rand() % (1 << 24));
     }
 
     return foo;
@@ -117,6 +127,7 @@ void insertionSort(T* first, T* last, Compare comp) {
         T* j = i;
         while (j > first && comp(*value, *(j - 1))) {
             new (j) T(std::move(*(j - 1)));
+            (j - 1)->~T();
             j--;
         }
 
