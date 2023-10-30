@@ -118,6 +118,7 @@ TEST(InsertionSort, InsertionSortAscTest) {
     insertionSort(a.data(), a.data() + a.size() - 1, compareIntAsc);
     for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
         EXPECT_LE(*i, *(i + 1));
+        EXPECT_EQ(*i, *(i + 1) - 1);
     }
 }
 
@@ -127,6 +128,7 @@ TEST(InsertionSort, InsertionSortDescTest) {
     insertionSort(a.data(), a.data() + a.size() - 1, compareIntDesc);
     for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
         EXPECT_GE(*i, *(i + 1));
+        EXPECT_EQ(*i, *(i + 1) + 1);
     }
 }
 
@@ -152,6 +154,7 @@ TEST(QuickSort, QuickSortAscTest) {
     quickSort(a.data(), a.data() + a.size() - 1, compareIntAsc);
     for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
         EXPECT_LE(*i, *(i + 1));
+        EXPECT_EQ(*i, *(i + 1) - 1);
     }
 }
 
@@ -161,6 +164,7 @@ TEST(QuickSort, QuickSortDescTest) {
     quickSortOptimized(a.data(), a.data() + a.size() - 1, compareIntDesc);
     for (int* i = a.data(); i < a.data() + a.size() - 2; i++) {
         EXPECT_GE(*i, *(i + 1));
+        EXPECT_EQ(*i, *(i + 1) + 1);
     }
 }
 

@@ -56,35 +56,26 @@ T* selectPivot(T* first, T* last, Compare comp) {
 
 template<typename T, typename Compare>
 T* partition(T* first, T* last, Compare comp) {
-    T* pivot = selectPivot(first, last, comp);
-    swap(*pivot, *last);
-    pivot = last;
+    T pivot = *selectPivot(first, last, comp);
 
     T* i = first - 1;
     T* j = last + 1;
 
     while (true) {
-        do { i++; } while (comp(*i, *pivot));
-        do { j--; } while (comp(*pivot, *j));
+        do { i++; } while (comp(*i, pivot));
+        do { j--; } while (comp(pivot, *j));
  
         if (i >= j) {
-            swap(*pivot, *j);
             return j;
         }
             
         swap(*i, *j);
-
-        if (i == pivot) {
-            pivot = j;
-        } else if (j == pivot) {
-            pivot = i;
-        }
     }
 }
 
 template<typename T, typename Compare>
 void quickSortOptimized(T* first, T* last, Compare comp) {
-    const int INSERTION_SORT_THRESHOLD = 128;
+    const int INSERTION_SORT_THRESHOLD = 16;
 
     if (last - first < INSERTION_SORT_THRESHOLD) {
         insertionSort(first, last, comp);
@@ -112,8 +103,7 @@ void quickSort(T* first, T* last, Compare comp) {
         if (pivot - first < last - pivot) {
             quickSort(first, pivot - 1, comp);
             first = pivot + 1;
-        }
-        else {
+        } else {
             quickSort(pivot + 1, last, comp);
             last = pivot - 1;
         }
@@ -123,14 +113,15 @@ void quickSort(T* first, T* last, Compare comp) {
 template<typename T, typename Compare>
 void insertionSort(T* first, T* last, Compare comp) {
     for (T* i = first + 1; i <= last; i++) {
-        T* value = i;
-        T* j = i;
-        while (j > first && comp(*value, *(j - 1))) {
-            new (j) T(std::move(*(j - 1)));
-            (j - 1)->~T();
+        T value = std::move(*i);
+        T* j = i - 1;
+
+        while (j >= first && comp(value, *j)) {
+            new (j + 1) T(std::move(*j));
+            (j)->~T();
             j--;
         }
 
-        new (j) T(std::move(*value));
+        new (j + 1) T(std::move(value));
     }
 }
