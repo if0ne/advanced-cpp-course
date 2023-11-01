@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuickSort", "QuickSort\Quic
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuickSortTest", "QuickSortTest\QuickSortTest.vcxproj", "{D8F6CCC2-8116-4363-8F1A-E02509DA01A6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CustomAllocator", "CustomAllocator\CustomAllocator.vcxproj", "{D8091263-C568-4D34-A956-B1E31841584A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +63,14 @@ Global
 		{D8F6CCC2-8116-4363-8F1A-E02509DA01A6}.Release|x64.Build.0 = Release|x64
 		{D8F6CCC2-8116-4363-8F1A-E02509DA01A6}.Release|x86.ActiveCfg = Release|Win32
 		{D8F6CCC2-8116-4363-8F1A-E02509DA01A6}.Release|x86.Build.0 = Release|Win32
+		{D8091263-C568-4D34-A956-B1E31841584A}.Debug|x64.ActiveCfg = Debug|x64
+		{D8091263-C568-4D34-A956-B1E31841584A}.Debug|x64.Build.0 = Debug|x64
+		{D8091263-C568-4D34-A956-B1E31841584A}.Debug|x86.ActiveCfg = Debug|Win32
+		{D8091263-C568-4D34-A956-B1E31841584A}.Debug|x86.Build.0 = Debug|Win32
+		{D8091263-C568-4D34-A956-B1E31841584A}.Release|x64.ActiveCfg = Release|x64
+		{D8091263-C568-4D34-A956-B1E31841584A}.Release|x64.Build.0 = Release|x64
+		{D8091263-C568-4D34-A956-B1E31841584A}.Release|x86.ActiveCfg = Release|Win32
+		{D8091263-C568-4D34-A956-B1E31841584A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
