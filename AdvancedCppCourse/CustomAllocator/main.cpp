@@ -107,7 +107,7 @@ public:
         FixedSizedBlockAllocator<N>* allocator;
         if (checkPtr(p, allocator)) {
             FreeListNode* fh = reinterpret_cast<FreeListNode*>(p);
-            allocator->fh->next = fh_;
+            fh->next = allocator->fh_;
             allocator->fh_ = fh;
 
 #ifdef _DEBUG
@@ -134,6 +134,28 @@ public:
             cur = cur->next_;
         }
         alloc = cur;
+        bool is_start_block = false;
+
+        if (cur != nullptr) {
+            is_start_block = ((char*)p - cur->page_) % N == 0;
+        }
+
+        return contains && is_start_block;
+    }
+
+    bool checkPtr(void* p) {
+        FixedSizedBlockAllocator<N>* cur = this;
+        bool contains = false;
+
+        while (cur != nullptr) {
+            contains |= cur->page_ <= (char*)p && (char*)p < cur->page_ + cur->size_;
+
+            if (contains) {
+                break;
+            }
+
+            cur = cur->next_;
+        }
         bool is_start_block = false;
 
         if (cur != nullptr) {
@@ -368,6 +390,29 @@ public:
         return contains && is_allocated_block;
     }
 
+    bool checkPtr(void* p) {
+        CoalesceAllocator* cur = this;
+        bool contains = false;
+
+        while (cur != nullptr) {
+            contains |= cur->page_ <= (char*)p && (char*)p < cur->page_ + cur->size_;
+
+            if (contains) {
+                break;
+            }
+
+            cur = cur->next_;
+        }
+
+        bool is_allocated_block = false;
+
+        if (cur != nullptr) {
+            is_allocated_block = reinterpret_cast<FreeListNode*>((char*)p - kHeader)->is_free == 0;
+        }
+
+        return contains && is_allocated_block;
+    }
+
     virtual ~CoalesceAllocator() {
         assert(page_ == nullptr);
     }
@@ -453,6 +498,7 @@ public:
     OsAllocator(size_t size) : IAllocator(size) {
         page_ = nullptr;
         next_ = nullptr;
+        is_free_ = false;
     }
 
     virtual void init() override {
@@ -525,7 +571,24 @@ public:
         }
         allocator = cur;
 
-        return contains && allocator->page_ == (char*)p;
+        return contains && cur->page_ == (char*)p;
+    }
+
+    bool checkPtr(void* p) {
+        OsAllocator* cur = this;
+        bool contains = false;
+
+        while (cur != nullptr) {
+            contains |= cur->page_ <= (char*)p && (char*)p < cur->page_ + cur->size_;
+
+            if (contains) {
+                break;
+            }
+
+            cur = cur->next_;
+        }
+
+        return contains && cur->page_ == (char*)p;
     }
 
     virtual ~OsAllocator() {
@@ -571,7 +634,172 @@ private:
     OsAllocator* next_;
 };
 
-int main() {
+class HybridAllocator final : public IAllocator {
+public:
+    HybridAllocator(size_t default_allocator_sizes) : 
+        IAllocator(default_allocator_sizes),
+        fsa16_(default_allocator_sizes),
+        fsa32_(default_allocator_sizes),
+        fsa64_(default_allocator_sizes),
+        fsa128_(default_allocator_sizes),
+        fsa256_(default_allocator_sizes),
+        fsa512_(default_allocator_sizes),
+        coalesce_(default_allocator_sizes),
+        os_(kTenMb)
+    {
+    }
 
+    virtual void init() override {
+        fsa16_.init();
+        fsa32_.init();
+        fsa64_.init();
+        fsa128_.init();
+        fsa256_.init();
+        fsa512_.init();
+        coalesce_.init();
+        os_.init();
+    }
+
+    virtual void destroy() override {
+        fsa16_.destroy();
+        fsa32_.destroy();
+        fsa64_.destroy();
+        fsa128_.destroy();
+        fsa256_.destroy();
+        fsa512_.destroy();
+        coalesce_.destroy();
+        os_.destroy();
+    }
+
+    virtual void* alloc(size_t size) override {
+        if (size <= 16) {
+            return fsa16_.alloc(size);
+        }
+
+        if (size <= 32) {
+            return fsa32_.alloc(size);
+        }
+
+        if (size <= 64) {
+            return fsa64_.alloc(size);
+        }
+
+        if (size <= 128) {
+            return fsa128_.alloc(size);
+        }
+
+        if (size <= 256) {
+            return fsa256_.alloc(size);
+        }
+
+        if (size <= 512) {
+            return fsa512_.alloc(size);
+        }
+
+        if (size < kTenMb) {
+            return coalesce_.alloc(size);
+        }
+
+        return os_.alloc(size);
+    }
+
+    virtual void free(void* p) override {
+        if (fsa16_.checkPtr(p)) {
+            fsa16_.free(p);
+            return;
+        }
+
+        if (fsa32_.checkPtr(p)) {
+            fsa32_.free(p);
+            return;
+        }
+
+        if (fsa64_.checkPtr(p)) {
+            fsa64_.free(p);
+            return;
+        }
+
+        if (fsa128_.checkPtr(p)) {
+            fsa128_.free(p);
+            return;
+        }
+
+        if (fsa256_.checkPtr(p)) {
+            fsa256_.free(p);
+            return;
+        }
+
+        if (fsa512_.checkPtr(p)) {
+            fsa512_.free(p);
+            return;
+        }
+
+        if (coalesce_.checkPtr(p)) {
+            coalesce_.free(p);
+            return;
+        }
+
+        if (os_.checkPtr(p)) {
+            os_.free(p);
+            return;
+        }
+
+        assert(false && "Wrong address to free");
+    }
+
+    virtual ~HybridAllocator() {
+    }
+#ifdef _DEBUG 
+    virtual void dumpStat() const override {
+        fsa16_.dumpStat();
+        fsa32_.dumpStat();
+        fsa64_.dumpStat();
+        fsa128_.dumpStat();
+        fsa256_.dumpStat();
+        fsa512_.dumpStat();
+        coalesce_.dumpStat();
+        os_.dumpStat();
+    }
+
+    virtual void dumpBlocks() const override {
+        fsa16_.dumpBlocks();
+        fsa32_.dumpBlocks();
+        fsa64_.dumpBlocks();
+        fsa128_.dumpBlocks();
+        fsa256_.dumpBlocks();
+        fsa512_.dumpBlocks();
+        coalesce_.dumpBlocks();
+        os_.dumpBlocks();
+    }
+#endif
+private:
+    const size_t kTenMb = 10 * 1024 * 1024;
+
+    FixedSizedBlockAllocator<16> fsa16_;
+    FixedSizedBlockAllocator<32> fsa32_;
+    FixedSizedBlockAllocator<64> fsa64_;
+    FixedSizedBlockAllocator<128> fsa128_;
+    FixedSizedBlockAllocator<256> fsa256_;
+    FixedSizedBlockAllocator<512> fsa512_;
+
+    CoalesceAllocator coalesce_;
+
+    OsAllocator os_;
+};
+
+int main() {
+    HybridAllocator allocator{ 2048 };
+    allocator.init();
+    int* pi = (int*)allocator.alloc(sizeof(int));
+    double* pd = (double*)allocator.alloc(sizeof(double));
+    int* pa = (int*)allocator.alloc(10 * sizeof(int));
+    int* ps = (int*)allocator.alloc(11 * 1024 * 1024);
+    allocator.dumpStat();
+    allocator.dumpBlocks();
+    allocator.free(pa);
+    allocator.free(pd);
+    allocator.free(pi);
+    allocator.free(ps);
+    allocator.destroy();
     return 0;
 }
