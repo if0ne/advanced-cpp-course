@@ -120,7 +120,7 @@ public:
         assert(false && "Wrong address to free");
     }
 
-    bool checkPtr(void* p, FixedSizedBlockAllocator<N>* alloc) {
+    bool checkPtr(void* p, FixedSizedBlockAllocator<N>*& alloc) {
         FixedSizedBlockAllocator<N>* cur = this;
         bool contains = false;
 
@@ -344,7 +344,7 @@ public:
         assert(false && "Wrong address to free");
     }
 
-    bool checkPtr(void* p, CoalesceAllocator* alloc) {
+    bool checkPtr(void* p, CoalesceAllocator*& alloc) {
         CoalesceAllocator* cur = this;
         bool contains = false;
 
@@ -446,6 +446,129 @@ private:
     FreeListNode* fh_;
 
     CoalesceAllocator* next_;
+};
+
+class OsAllocator final : public IAllocator {
+public:
+    OsAllocator(size_t size) : IAllocator(size) {
+        page_ = nullptr;
+        next_ = nullptr;
+    }
+
+    virtual void init() override {
+        page_ = (char*)VirtualAlloc(nullptr, size_, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        assert(page_);
+        is_free_ = true;
+    }
+
+    virtual void destroy() override {
+        assert(page_);
+
+#ifdef _DEBUG
+        if (!is_free_) {
+            std::cout << "Detected memory leak. Address: " << (void*)(page_) << " Bytes: " << size_ << "\n";
+        }
+#endif
+
+        if (next_) {
+            next_->destroy();
+            delete next_;
+        }
+
+        VirtualFree((void*)page_, 0, MEM_RELEASE);
+        page_ = nullptr;
+    }
+
+    virtual void* alloc(size_t size) override {
+        assert(page_);
+
+        if (is_free_ && size <= size_) {
+            is_free_ = false;
+            return page_;
+        }
+
+        if (!next_) {
+            next_ = new OsAllocator(size);
+            next_->init();
+        }
+
+        void* mem = next_->alloc(size);
+
+        return mem;
+    }
+
+    virtual void free(void* p) override {
+        assert(page_);
+
+        OsAllocator* allocator = nullptr;
+
+        if (checkPtr(p, allocator)) {
+            allocator->is_free_ = true;
+            return;
+        }
+
+        assert(false && "Wrong address to free");
+    }
+
+    bool checkPtr(void* p, OsAllocator*& allocator) {
+        OsAllocator* cur = this;
+        bool contains = false;
+
+        while (cur != nullptr) {
+            contains |= cur->page_ <= (char*)p && (char*)p < cur->page_ + cur->size_;
+
+            if (contains) {
+                break;
+            }
+
+            cur = cur->next_;
+        }
+        allocator = cur;
+
+        return contains && allocator->page_ == (char*)p;
+    }
+
+    virtual ~OsAllocator() {
+        assert(page_ == nullptr);
+    }
+#ifdef _DEBUG 
+    virtual void dumpStat() const override {
+        assert(page_);
+
+        size_t total_blocks = 0;
+        size_t total_alloc_blocks = 0;
+
+        const OsAllocator* cur = this;
+
+        std::cout << "OS Pages:\n";
+        while (cur) {
+            total_blocks++;
+            if (!cur->is_free_) total_alloc_blocks++;
+            std::cout << "Address: " << (void*)cur->page_ << " Bytes:" << cur->size_ << "\n";
+            cur = cur->next_;
+        }
+
+        std::cout << "Allocated blocks: " << total_alloc_blocks << "\n";
+        std::cout << "Free blocks: " << total_blocks - total_alloc_blocks << "\n";
+    }
+
+    virtual void dumpBlocks() const override {
+        assert(page_);
+
+        std::cout << "Allocated blocks:\n";
+        const OsAllocator* cur = this;
+
+        while (cur) {
+            std::cout << "Address: " << (void*)cur->page_ << " Bytes:" << cur->size_ << "\n";
+            cur = cur->next_;
+        }
+    }
+#endif
+private:
+    char* page_;
+    bool is_free_;
+
+    OsAllocator* next_;
 };
 
 int main() {
