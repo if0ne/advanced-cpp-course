@@ -127,7 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CoalesceAllocator.cpp" />
+    <ClCompile Include="HybridAllocator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OsAllocator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CoalesceAllocator.h" />
+    <ClInclude Include="FixedSizedBlockAllocator.h" />
+    <ClInclude Include="HybridAllocator.h" />
+    <ClInclude Include="IAllocator.h" />
+    <ClInclude Include="OsAllocator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
