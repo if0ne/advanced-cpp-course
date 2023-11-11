@@ -14,5 +14,6 @@ int main() {
     allocator.free(pi);
     allocator.free(ps);
     allocator.destroy();
+
     return 0;
 }

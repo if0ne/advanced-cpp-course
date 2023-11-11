@@ -2,8 +2,9 @@
 void CoalesceAllocator::init() {
     page_ = (char*)VirtualAlloc(nullptr, size_, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     assert(page_);
+    offset = sizeof(CoalesceAllocator);
 
-    fh_ = reinterpret_cast<FreeListNode*>(page_);
+    fh_ = reinterpret_cast<FreeListNode*>(page_ + offset);
     fh_->is_free = 1;
     fh_->size = size_;
     fh_->prev = nullptr;
@@ -27,7 +28,6 @@ void CoalesceAllocator::destroy() {
 
     if (next_) {
         next_->destroy();
-        delete next_;
     }
 
     VirtualFree((void*)page_, 0, MEM_RELEASE);
@@ -42,7 +42,8 @@ void* CoalesceAllocator::alloc(size_t size) {
 
     if (!free) {
         if (next_ == nullptr) {
-            next_ = new CoalesceAllocator(size_);
+            next_ = reinterpret_cast<CoalesceAllocator*>(page_);
+            new (next_) CoalesceAllocator(size_);
             next_->init();
         }
 
@@ -127,7 +128,7 @@ bool CoalesceAllocator::checkPtr(void* p, CoalesceAllocator*& alloc) {
     bool contains = false;
 
     while (cur != nullptr) {
-        contains |= cur->page_ <= (char*)p && (char*)p < cur->page_ + cur->size_;
+        contains |= cur->page_ + offset <= (char*)p && (char*)p < cur->page_ + cur->size_;
 
         if (contains) {
             break;
@@ -190,7 +191,7 @@ void CoalesceAllocator::dumpStat() const {
 
     const CoalesceAllocator* cur = this;
 
-    std::cout << "OS Pages:\n";
+    std::cout << "OS Pages for CoalesceAllocator:\n";
     while (cur) {
 
         std::cout << "Address: " << (void*)cur->page_ << " Bytes:" << cur->size_ << "\n";
@@ -205,7 +206,7 @@ void CoalesceAllocator::dumpStat() const {
 void CoalesceAllocator::dumpBlocks() const {
     assert(page_);
 
-    std::cout << "Allocated blocks:\n";
+    std::cout << "Allocated blocks for CoalesceAllocator:\n";
     FreeListNode* cur = fh_;
 
     while (cur) {

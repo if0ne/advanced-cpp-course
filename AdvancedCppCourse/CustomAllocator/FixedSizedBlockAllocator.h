@@ -17,11 +17,6 @@ public:
         page_ = nullptr;
         fh_ = nullptr;
         next_ = nullptr;
-
-#ifdef _DEBUG
-        block_count_ = 0;
-        alloc_block_count_ = 0;
-#endif 
     }
 
     virtual void init() override;
@@ -45,6 +40,7 @@ private:
     char* page_;
     FreeListNode* fh_;
 
+    int offset;
     FixedSizedBlockAllocator<N>* next_;
 
 #ifdef _DEBUG
@@ -55,11 +51,17 @@ private:
 
 template<size_t N>
 void FixedSizedBlockAllocator<N>::init() {
+    offset = sizeof(FixedSizedBlockAllocator<N>);
+#ifdef _DEBUG
+    block_count_ = 0;
+    alloc_block_count_ = 0;
+#endif 
+
     page_ = (char*)VirtualAlloc(nullptr, size_, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     assert(page_);
 
-    fh_ = reinterpret_cast<FreeListNode*>(page_);
-    size_t num = size_ / N;
+    fh_ = reinterpret_cast<FreeListNode*>(page_ + offset);
+    size_t num = (size_ - offset) / N;
 
 #ifdef _DEBUG
     block_count_ = num;
@@ -67,11 +69,12 @@ void FixedSizedBlockAllocator<N>::init() {
 
     FreeListNode* cur = fh_;
     for (size_t i = 0; i < num - 1; i++) {
-        cur->next = reinterpret_cast<FreeListNode*>(page_ + (i + 1) * N);
+        cur->next = reinterpret_cast<FreeListNode*>(page_ + offset + (i + 1) * N);
         cur = cur->next;
     }
 
     cur->next = nullptr;
+    next_ = nullptr;
 }
 
 template<size_t N>
@@ -80,15 +83,14 @@ void FixedSizedBlockAllocator<N>::destroy() {
 
 #ifdef _DEBUG
     for (size_t i = 0; i < block_count_; i++) {
-        if (isAllocatedBlock(page_ + i * N)) {
-            std::cout << "Detected memory leak. Address: " << (void*)(page_ + i * N) << " Bytes: " << N << "\n";
+        if (isAllocatedBlock(page_ + offset + i * N)) {
+            std::cout << "Detected memory leak. Address: " << (void*)(page_ + offset + i * N) << " Bytes: " << N << "\n";
         }
     }
 #endif
 
     if (next_) {
         next_->destroy();
-        delete next_;
     }
 
     VirtualFree((void*)page_, 0, MEM_RELEASE);
@@ -112,11 +114,12 @@ void* FixedSizedBlockAllocator<N>::alloc(size_t size) {
         return mem;
     }
 
-    if (next_ == nullptr) {
-        next_ = new FixedSizedBlockAllocator<N>(size_);
+    if (next_ = nullptr) {
+        next_ = reinterpret_cast<FixedSizedBlockAllocator<N>*>(page_);
+        new (next_) FixedSizedBlockAllocator<N>(size_);
         next_->init();
     }
-
+ 
     mem = next_->alloc(size);
 
     return mem;
@@ -147,7 +150,7 @@ bool FixedSizedBlockAllocator<N>::checkPtr(void* p, FixedSizedBlockAllocator<N>*
     bool contains = false;
 
     while (cur != nullptr) {
-        contains |= cur->page_ <= (char*)p && (char*)p < cur->page_ + cur->size_;
+        contains |= cur->page_ + offset <= (char*)p && (char*)p < cur->page_ + cur->size_;
 
         if (contains) {
             break;
@@ -159,7 +162,7 @@ bool FixedSizedBlockAllocator<N>::checkPtr(void* p, FixedSizedBlockAllocator<N>*
     bool is_start_block = false;
 
     if (cur != nullptr) {
-        is_start_block = ((char*)p - cur->page_) % N == 0;
+        is_start_block = ((char*)p - (cur->page_ + offset)) % N == 0;
     }
 
     return contains && is_start_block;
@@ -198,7 +201,7 @@ void FixedSizedBlockAllocator<N>::dumpStat() const {
 
     const FixedSizedBlockAllocator<N>* cur = this;
 
-    std::cout << "OS Pages:\n";
+    std::cout << "OS Pages for FixedSizedBlockAllocator<" << N << ">:\n";
     while (cur) {
         total_blocks += cur->block_count_;
         total_alloc_blocks += cur->alloc_block_count_;
@@ -216,11 +219,11 @@ void FixedSizedBlockAllocator<N>::dumpBlocks() const {
 
     const FixedSizedBlockAllocator<N>* cur = this;
 
-    std::cout << "Allocated blocks:\n";
+    std::cout << "Allocated blocks for FixedSizedBlockAllocator<" << N << ">:\n";
     while (cur) {
         for (size_t i = 0; i < cur->block_count_; i++) {
-            if (cur->isAllocatedBlock(cur->page_ + i * N)) {
-                std::cout << "Address: " << (void*)(cur->page_ + i * N) << " Bytes: " << N << "\n";
+            if (cur->isAllocatedBlock(cur->page_ + offset + i * N)) {
+                std::cout << "Address: " << (void*)(cur->page_ + offset + i * N) << " Bytes: " << N << "\n";
             }
         }
         cur = cur->next_;

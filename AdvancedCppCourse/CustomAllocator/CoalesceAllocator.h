@@ -45,6 +45,7 @@ private:
     char* page_;
     FreeListNode* fh_;
 
+    int offset;
     CoalesceAllocator* next_;
 };
 

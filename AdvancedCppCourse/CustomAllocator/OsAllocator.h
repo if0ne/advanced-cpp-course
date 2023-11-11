@@ -32,5 +32,6 @@ private:
     char* page_;
     bool is_free_;
 
+    int offset;
     OsAllocator* next_;
 };

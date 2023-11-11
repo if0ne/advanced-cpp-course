@@ -1,7 +1,8 @@
 #include "OsAllocator.h"
 void OsAllocator::init() {
+    offset = sizeof(OsAllocator);
     if (size_ != 0) {
-        page_ = (char*)VirtualAlloc(nullptr, size_, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        page_ = (char*)VirtualAlloc(nullptr, size_ + offset, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         assert(page_);
         is_free_ = true;
     }
@@ -12,13 +13,12 @@ void OsAllocator::destroy() {
 
 #ifdef _DEBUG
     if (!is_free_) {
-        std::cout << "Detected memory leak. Address: " << (void*)(page_) << " Bytes: " << size_ << "\n";
+        std::cout << "Detected memory leak. Address: " << (void*)(page_ + offset) << " Bytes: " << size_ << "\n";
     }
 #endif
 
     if (next_) {
         next_->destroy();
-        delete next_;
     }
 
     VirtualFree((void*)page_, 0, MEM_RELEASE);
@@ -33,11 +33,12 @@ void* OsAllocator::alloc(size_t size) {
 
     if (is_free_ && size <= size_) {
         is_free_ = false;
-        return page_;
+        return page_ + offset;
     }
 
     if (!next_) {
-        next_ = new OsAllocator();
+        next_ = reinterpret_cast<OsAllocator*>(page_);
+        new (next_) OsAllocator();
     }
 
     void* mem = next_->alloc(size);
@@ -63,7 +64,7 @@ bool OsAllocator::checkPtr(void* p, OsAllocator*& allocator) {
     bool contains = false;
 
     while (cur != nullptr) {
-        contains |= cur->page_ <= (char*)p && (char*)p < cur->page_ + cur->size_;
+        contains |= cur->page_ + offset <= (char*)p && (char*)p < cur->page_ + cur->size_;
 
         if (contains) {
             break;
@@ -73,7 +74,7 @@ bool OsAllocator::checkPtr(void* p, OsAllocator*& allocator) {
     }
     allocator = cur;
 
-    return contains && cur->page_ == (char*)p;
+    return contains && cur->page_ + offset == (char*)p;
 }
 
 bool OsAllocator::checkPtr(void* p) {
@@ -90,7 +91,7 @@ void OsAllocator::dumpStat() const {
 
     const OsAllocator* cur = this;
 
-    std::cout << "OS Pages:\n";
+    std::cout << "OS Pages for OsAllocator:\n";
     while (cur) {
         total_blocks++;
         if (!cur->is_free_) total_alloc_blocks++;
@@ -105,11 +106,11 @@ void OsAllocator::dumpStat() const {
 void OsAllocator::dumpBlocks() const {
     assert(page_);
 
-    std::cout << "Allocated blocks:\n";
+    std::cout << "Allocated blocks for OsAllocator:\n";
     const OsAllocator* cur = this;
 
     while (cur) {
-        std::cout << "Address: " << (void*)cur->page_ << " Bytes:" << cur->size_ << "\n";
+        std::cout << "Address: " << (void*)(cur->page_ + offset) << " Bytes:" << cur->size_ << "\n";
         cur = cur->next_;
     }
 }
